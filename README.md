@@ -10,7 +10,7 @@ This project aims to build a chatbot with an LLM model hosted on Azure Cloud usi
 
 
 
-![](/pictures/structurizr-Diagram2.png?raw=true"")
+![Component Diagram](/pictures/structurizr-Diagram2.png?raw=true"")
 ![Diagram Key](/pictures/structurizr-Diagram2-key.png?raw=true"")
 
 
@@ -19,5 +19,5 @@ This project aims to build a chatbot with an LLM model hosted on Azure Cloud usi
 
 
 
-![](/pictures/structurizr-Diagram3.png?raw=true"")
+![Component Diagram](/pictures/structurizr-Diagram3.png?raw=true"")
 ![Diagram Key](/pictures/structurizr-Diagram3-key.png?raw=true"")
