@@ -6,9 +6,20 @@
 ![](/pictures/structurizr-Diagram1-key.png?raw=true"")
 
 
+
+
+
+
+
 ![](/pictures/structurizr-Diagram2.png?raw=true"")
 
 ![](/pictures/structurizr-Diagram2-key.png?raw=true"")
+
+
+
+
+
+
 
 ![](/pictures/structurizr-Diagram3.png?raw=true"")
 
