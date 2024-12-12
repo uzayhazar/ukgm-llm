@@ -1,6 +1,6 @@
 # ukgm-llm
 
-![Alt text](/pictures/structurizr-Diagram1.png?raw=true "Optional Title")
+!(/pictures/structurizr-Diagram1.png?raw=true "Optional Title")
 !(/pictures/structurizr-Diagram1-key.png?raw=true)
 
 
