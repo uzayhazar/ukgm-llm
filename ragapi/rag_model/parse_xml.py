@@ -1,34 +1,40 @@
 import xml.etree.ElementTree as ET
 
-def extract_text_from_recommendation_sections(input_file):
-    # Parse the XML file
-    tree = ET.parse(input_file)
-    root = tree.getroot()
+class Parse_XML:
+    def __init__(self, input_file):
+        self.input_file = input_file
 
-    # Find all <recommendation> elements
-    recommendation_elements = root.findall('.//recommendation')
+    def extract_text_from_recommendation_sections(self):
+        # Parse the XML file
+        tree = ET.parse(self.input_file)
+        root = tree.getroot()
 
-    # List to hold the extracted text content
-    text_list = []
+        # Find all <recommendation> elements
+        recommendation_elements = root.findall('.//recommendation')
 
-    i = 0
+        # List to hold the extracted text content
+        text_list = []
 
-    # Iterate through all <recommendation> elements
-    for recommendation_element in recommendation_elements:
-        # Get the content of the <recommendation> element as a string
-        recommendation = recommendation_element.findall('.//text')
+        i = 0
 
-        # Add the text to the list
-        text_list.append(recommendation[0].text)
+        # Iterate through all <recommendation> elements
+        for recommendation_element in recommendation_elements:
+            # Get the content of the <recommendation> element as a string
+            recommendation = recommendation_element.findall('.//text')
 
-    return text_list
+            # Add the text to the list
+            text_list.append(recommendation[0].text)
+
+        return text_list
+
 
 # Example usage
-input_file = 'rag_model/cpg-corpus-cms.xml'
+# input_file = 'rag_model/cpg-corpus-cms.xml'
 # input_file = 'cpg-corpus-cms.xml'
-text_list = extract_text_from_recommendation_sections(input_file)
+# pxml = Parse_XML(input_file)
+# text_list = pxml.extract_text_from_recommendation_sections()
 
-# Print out the first bottom section's text for demonstration
-print(len(text_list))
-print(text_list[11])
+# # Print out the first bottom section's text for demonstration
+# print(len(text_list))
+# print(text_list[11])
 

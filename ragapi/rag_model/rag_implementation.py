@@ -6,8 +6,8 @@ import torch
 from transformers import GPTJForCausalLM, GPT2Tokenizer
 from langchain_huggingface import HuggingFaceEmbeddings
 
-from rag_model.generate_vectors import vectorstore, doc_texts
-# from generate_vectors import vectorstore, doc_texts
+from rag_model.generate_vectors import Vectorizer
+# from generate_vectors import Vectorizer
 
 
 class RAGChat:
@@ -16,6 +16,8 @@ class RAGChat:
         self.query = query
 
     def vector_search(self):
+        vectorizer = Vectorizer()
+        vectorstore, doc_texts = vectorizer.create_faiss_vectorstore()
 
         embedding_model = HuggingFaceEmbeddings(model_name='sentence-transformers/all-MiniLM-L6-v2')
         # if not self.query:
