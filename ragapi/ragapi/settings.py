@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -32,24 +34,37 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'django.contrib.admin',
-    'rest_framework',
-    'drf_yasg',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+
+    'rest_framework',
+    'rest_framework.authtoken',
+    'drf_yasg',
+
+    # Authentication
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.apple',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
     'rag'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'ragapi.urls'
@@ -57,7 +72,7 @@ ROOT_URLCONF = 'ragapi.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -69,6 +84,64 @@ TEMPLATES = [
         },
     },
 ]
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+# Site ID (required for allauth)
+SITE_ID = 1
+
+# CSRF Settings (IMPORTANT for session-based authentication)
+CSRF_USE_SESSIONS = True   # Store CSRF token in session (no need to send separately)
+CSRF_COOKIE_HTTPONLY = False  # Allow frontend to access CSRF token if needed
+CSRF_COOKIE_SECURE = False  # Set to True if using HTTPS
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000', 'http://localhost:8000']  # Include frontend origins
+# CSRF_COOKIE_NAME = 'csrftoken'
+SESSION_COOKIE_HTTPONLY = True  # Secure session storage
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+
+
+# AllAuth configuration
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_VERIFICATION = "True"  # Set to 'mandatory' in production
+
+load_dotenv()
+
+# OAuth providers settings
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': os.getenv("CLIENT_ID"),
+            'secret': os.getenv("SECRET_ID"),
+            'key': ''
+        },
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'offline',
+        }
+    },
+    'apple': {
+        'APP': {
+            'client_id': 'YOUR_APPLE_CLIENT_ID',
+            'secret': 'YOUR_APPLE_CLIENT_SECRET',
+            'key': 'YOUR_APPLE_KEY_ID',
+            'certificate_key': 'YOUR_APPLE_PRIVATE_KEY',
+            'team_id': 'YOUR_APPLE_TEAM_ID',
+        },
+        'SCOPE': [
+            'name',
+            'email',
+        ],
+    }
+}
 
 WSGI_APPLICATION = 'ragapi.wsgi.application'
 
@@ -126,5 +199,31 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rag.authentication.CsrfExemptSessionAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',  # Ensure this is enabled
+        # 'rest_framework.authentication.BasicAuthentication',
+    ),
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.openapi.AutoSchema',
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',  # Require authentication globally
+    ),
+}
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'SessionAuth': {
+            'type': 'apiKey',
+            'in': 'cookie',
+            'name': 'sessionid',  # Default Django session cookie name
+        },
+        # 'CSRFToken': {
+        #     'type': 'apiKey',
+        #     'in': 'header',
+        #     'name': 'X-CSRFToken',  # Ensure CSRF token is sent
+        # },
+    },
+    'USE_SESSION_AUTH': True,  # Enable session authentication in Swagger
+    'LOGIN_URL': '/accounts/login/',  # Django allauth login
+    'LOGOUT_URL': '/accounts/logout/',  # Django allauth logout
 }

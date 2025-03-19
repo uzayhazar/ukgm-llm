@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auth Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .button { display: inline-block; padding: 10px 15px; margin: 5px; background: #4285f4; color: white; text-decoration: none; border-radius: 4px; }
+        .apple { background: #000; }
+        pre { background: #f5f5f5; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        #result { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>OAuth Authentication Test</h1>
+    
+    <div>
+        <a href="/accounts/google/login/" class="button">Login with Google</a> <!-- ✅ Fix: Redirect to AllAuth -->
+        <a href="/accounts/apple/login/" class="button apple">Login with Apple</a>
+        <button onclick="logoutUser()" class="button" style="background: #d32f2f;">Logout</button>
+        <button onclick="getUserInfo()" class="button" style="background: #0F9D58;">Get User Info</button>
+        <button onclick="testAuth()" class="button" style="background: #F4B400;">Test Auth</button>
+        <button onclick="testAPI()" class="button" style="background: #06430f;">Test API</button>
+    </div>
+
+    <div id="result">
+        <h3>User Info:</h3>
+        <pre id="user-info">No data yet...</pre>  <!-- ✅ Ensure this exists -->
+    </div>
+
+    <script>
+        function getUserInfo() {
+            fetch('/api/auth/user/', {
+                method: 'GET',
+                credentials: 'include',  // Ensures session cookies are sent
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')  // Include CSRF token if required
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultElement = document.getElementById('user-info'); // ✅ Make sure this exists
+                if (resultElement) {
+                    resultElement.innerHTML = JSON.stringify(data, null, 2);
+                } else {
+                    console.error('Error: Element #user-info not found in the DOM.');
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                const resultElement = document.getElementById('result');
+                if (resultElement) {
+                    resultElement.innerHTML = '<h3>Error:</h3><pre>' + error.message + '</pre>';
+                } else {
+                    console.error('Error: Element #result not found in the DOM.');
+                }
+            });
+        }
+
+        function testAuth() {
+            fetch('/api/auth/test/', {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('user-info').innerHTML = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                document.getElementById('user-info').innerHTML = '<h3>Error:</h3><pre>' + error.message + '</pre>';
+            });
+        }
+
+        function testAPI() {
+            fetch('/api/rag/testt/', {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultElement = document.getElementById('user-info'); // ✅ Make sure this exists
+                if (resultElement) {
+                    resultElement.innerHTML = JSON.stringify(data, null, 2);
+                } else {
+                    console.error('Error: Element #user-info not found in the DOM.');
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                const resultElement = document.getElementById('result');
+                if (resultElement) {
+                    resultElement.innerHTML = '<h3>Error:</h3><pre>' + error.message + '</pre>';
+                } else {
+                    console.error('Error: Element #result not found in the DOM.');
+                }
+            });
+        }
+        
+        function logoutUser() {
+        fetch('/api/rag/logout/', {
+            method: 'GET',  // ✅ Ensure POST request
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')  // ✅ Include CSRF token
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert(data.message);  // ✅ Show success message
+            } else {
+                alert("Logout successful");
+            }
+            window.location.href = "index";  // ✅ Redirect to homepage
+        })
+        .catch(error => {
+            console.error('Logout failed:', error);
+            alert("Error during logout");
+        });
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>

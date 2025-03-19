@@ -15,10 +15,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
+from rest_framework import permissions
+
+from django.views.generic import TemplateView
+# from rag.views import GoogleLogin
 
 openapi_info = openapi.Info(
     title="LLM-RAG API",
@@ -28,15 +32,18 @@ openapi_info = openapi.Info(
 schema_view = get_schema_view(
     openapi_info,
     public=True,
-    # permission_classes=(permissions.IsAuthenticated,),
+    permission_classes=[permissions.AllowAny]
 )
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api-auth/', include('rest_framework.urls')),
-    path('rag/', include('rag.urls', namespace='rag')),
-    path('rag/documentation/',
+    path('api/auth/', include('dj_rest_auth.urls')),
+    path('accounts/', include('allauth.urls')),
+    path('api/rag/', include('rag.urls', namespace='rag')),
+    # path('index', TemplateView.as_view(template_name='index.html'), name='index'),
+    path('api/rag/documentation/',
          schema_view.with_ui('swagger', cache_timeout=0),
          name='schema-swagger-ui'),
+    re_path(r'^.*', TemplateView.as_view(template_name='index.html'), name='index'),
 ]
